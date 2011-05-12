@@ -5,8 +5,30 @@ This is a student implementation of the memory allocator malloc as specified by
 the ANSI/ISO standards.
 
 
+How to build and run
+--------------------
+
+The included Makefile lets you build each test program simply by running `make
+<test-program-name>`, where <test-program-name> is the name of the test program
+source file WITHOUT any extension. Then it is simply a matter of executing the
+resulting executable.
+
+It is possible to easily switch between our own malloc implementation and the
+one built-in to the system; by default our own malloc is linked with the test
+cases; in order to use the one built-in to the system, just run `make
+<test-program-name> MALLOC=` to reset the Makefile variable MALLOC, and thus
+let the linker use the one included in your system.
+
+
+Tests
+-----
+
+All source file names that starts with "tst" are assumed to be tests containing
+a main() method, which performs the test(s).
+
+
 Original README
----------------
+===============
 
 This directory contains a suite of seven tests to be used for checking your
 implementation of malloc routines.

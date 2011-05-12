@@ -14,6 +14,8 @@ CFLAGS=
 # Default plus extra flags for C preprocessor and compiler.
 all_cflags=$(CFLAGS) -Wall -Wextra -g -ansi -DSTRATEGY=2
 
+# Malloc source file to use. Set to empty (with `make MALLOC=`) for system default.
+MALLOC=malloc.c
 
 ##################################################
 ## Setup files variables
@@ -21,7 +23,7 @@ all_cflags=$(CFLAGS) -Wall -Wextra -g -ansi -DSTRATEGY=2
 
 # Source files to compile and link together
 srcs=malloc.c tstalgorithms.c tstcrash.c tstcrash_complex.c tstcrash_simple.c \
-	 tstextreme.c tstmalloc.c tstmemory.c tstrealloc.c tstmerge.c
+	 tstextreme.c tstmalloc.c tstmemory.c tstmerge.c tstrealloc.c
 
 # Deduce object files from source files
 objs=$(srcs:.c=.o)
@@ -40,13 +42,14 @@ execs=$(patsubst tst%.c, tst%, $(filter tst%.c, $(srcs)))
 
 all: $(execs)
 
-tst%: tst%.o
-	$(CC) $(all_cflags) -o $@ $<
+tst%: tst%.o $(MALLOC:.c=.o)
+	$(CC) $(all_cflags) -o $@ $^
 
-# These programs can not be compiled as ANSI-standard C. */ 
+# These programs can not be compiled as ANSI-standard C.
 tst%.o: tst%.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
+# But the rest should be ANSI-standard C.
 %.o: %.c
 	$(CC) -c $(all_cflags) $< -o $@
 
