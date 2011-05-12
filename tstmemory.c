@@ -18,7 +18,7 @@ int main(int argc, char *argv[]){
   float worst;
   char *a[SIZE], *b[BIGSIZE];
   size_t pagesize;
-  void * lowbreak, highbreak, maxbreak = 0;
+  void *lowbreak, *highbreak, *maxbreak = 0;
   char *progname;
 
   if (argc > 0)

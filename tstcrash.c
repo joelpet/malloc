@@ -15,8 +15,11 @@ void t_stack()
   exit(1);
 }
 
-  
+#if (defined __USE_XOPEN_EXTENDED && !defined __USE_XOPEN2K) || defined __USE_MISC
+/* sbrk already defined */
+#else
 extern caddr_t sbrk(int);
+#endif
 
 int main(int argc, char *argv[]){
   
