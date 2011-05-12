@@ -1,0 +1,16 @@
+This directory contains a suite of seven tests to be used for checking your
+implementation of malloc routines.
+
+The file sysmalloc.o has been extracted from the the system's standard
+library. You can compare the performance of your malloc implementation
+against the system's one.
+
+The Makefile can be used directly to compile and generate all seven
+binaries. The name of your file should be "malloc.c". Note that
+compilation is done using GNU's C compiler. You can also use any other
+ANSI compiler.
+
+The script RUN_TESTS runs all seven tests. Normally, a test should
+take a few seconds to complete.
+
+Have fun!
