@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/sh
 echo "-- Testing your implementation of malloc --"
 echo ""
 echo "- If you have any problem in passing a test read the corresponding"
@@ -6,26 +6,26 @@ echo "- source file to understand what the test is checking"
 echo ""
 echo -n "********************* TEST MERGE ... "
 read answ
-./t0
+./tstmerge
 echo -n "********************* TEST ALGORITHMS ... "
 read answ
-./t1
+./tstalgorithms
 echo -n "********************* TEST EXTREME USAGE ... "
 read ans
-./t2
+./tstextreme
 echo -n "********************* TEST MALLOC ... "
 read ans
-./t3
+./tstmalloc
 echo -n "********************* TEST MEMORY ... "
 read ans
-./t4
+./tstmemory
 echo -n "********************* TEST REALLOC ... "
 read ans
-./t5
+./tstrealloc
 echo -n "********************* TEST CRASH  SIMPLE ... "
 read ans
-./t6
+./tstcrash_simple
 echo -n "********************* TEST CRASH COMPLEX ...  "
 read ans
-./t7
+./tstcrash_complex
 
