@@ -1,3 +1,13 @@
+README
+======
+
+This is a student implementation of the memory allocator malloc as specified by
+the ANSI/ISO standards.
+
+
+Original README
+---------------
+
 This directory contains a suite of seven tests to be used for checking your
 implementation of malloc routines.
 
