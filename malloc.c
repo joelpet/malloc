@@ -148,3 +148,67 @@ void free(void *ap)
     freep = p;
 }
 
+void *realloc(void *ptr, size_t size) {
+
+    Header *bp, *p, *nextp, newp;
+
+    if (ptr == NULL) {
+        return malloc(size);
+    } else if (size <= 0) {
+        free(ptr);
+        return NULL;
+    }
+
+    bp = (Header*)ptr-1;
+    if (size == bp->s.size) {
+        return ptr;
+    }
+
+    /* sista blocket i listan (innan det tar slut) */
+    if (bp >= bp->s.ptr) {
+        /* mallockera mer minne och kopiera data eetc. */
+        p = malloc(size);
+        memcpy(ptr, p, size);
+        free(ptr);
+    }
+    
+    /* check if the new block is smaller --> fitts */
+    if (size < bp->s.size) {
+        /* divide the block and update bp */
+        nextp = bp->s.ptr;
+        newp = bp + size;
+        newp->s.ptr = nextp;
+        newp->s.size = bp->s.size-size;
+        bp->s.size = size;
+        /* check if there was a perfect fit */
+        if (nextp == newp){
+          newp->s.size += nextp->s.size;
+          newp->s.ptr = nextp->s.ptr;
+        }
+        return ptr;        
+    }
+    /* check if there is an adjacent block that fitts the new size */
+    if (bp->s.size + ptr == bp->s.ptr && bp->s.size >= size - bp->s.size) {
+        nextp = bp->s.ptr;
+        /* perfect fit */
+        if (size == bp->s.size + nextp->s.size) {
+            bp->s.ptr = nextp->s.ptr;
+            bp->s.size = size;
+            return ptr;
+        }
+        /* divide the next block and update bp */
+        newp = bp + size;
+        newp->s.ptr = nextp->s.ptr;
+        newp->s.size = nextp->s.size - (size - bp->s.size);
+        bp->s.size = size;
+        
+    }
+
+    /* mallockera mer minne och kopiera data eetc. */
+    p = malloc(size);
+    memcpy(ptr, p, size);
+    free(ptr);
+
+}
+
+
