@@ -150,7 +150,7 @@ void free(void *ap)
 
 void *realloc(void *ptr, size_t size) {
 
-    Header *bp, *p, *nextp, newp;
+    Header *bp, *p, *nextp, *newp;
 
     if (ptr == NULL) {
         return malloc(size);
