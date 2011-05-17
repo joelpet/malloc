@@ -3,7 +3,7 @@
 
 #ifndef	_UNISTD_H /* USE WITH CAUTION brk() and sbrk() have been removed from the POSIX standard, most systems implement them but the parameter types may vary */
 extern int brk(void *);
-extern void *sbrk( );
+extern void *sbrk();
 #endif
 
 /* Disable the following, because it is already done in sys/types.h. */
