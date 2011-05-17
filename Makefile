@@ -11,8 +11,11 @@ CC=gcc
 # Extra flags to give to the C preprocessor and programs that use it (the C and Fortran compilers). 
 CFLAGS=
 
+# What allocation strategy to use.
+STRATEGY=2
+
 # Default plus extra flags for C preprocessor and compiler.
-all_cflags=$(CFLAGS) -Wall -Wextra -g -ansi -DSTRATEGY=2
+all_cflags=$(CFLAGS) -Wall -Wextra -g -ansi -DSTRATEGY=$(STRATEGY)
 
 # Malloc source file to use. Set to empty (with `make MALLOC=`) for system default.
 MALLOC=malloc.c

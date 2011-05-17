@@ -1,6 +1,11 @@
 #include "brk.h"
 #include "malloc.h"
+#include <stdbool.h>
 #include <unistd.h>
+
+#ifndef STRATEGY
+#define STRATEGY 1
+#endif
 
 static Header base; /* empty list to get started */
 static Header *freep = NULL; /* start of free list */
@@ -8,23 +13,53 @@ static Header *freep = NULL; /* start of free list */
 /* malloc: general-purpose storage allocator */
 void *malloc(size_t nbytes)
 {
+    Header *p, *prevp;
+    Header *moreroce(unsigned);
+    unsigned nunits;
+#if STRATEGY == 2
+    Header *minp, *minprevp;
+    bool found_fitting_block = false;
+#elif STRATEGY == 3
+    Header *maxp, *maxprevp;
+    bool found_fitting_block = false;
+#endif
+
     if (nbytes == 0) {
         return NULL;
     }
 
-    Header *p, *prevp;
-    Header *moreroce(unsigned);
-    unsigned nunits;
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
     if ((prevp = freep) == NULL) { /* no free list yet */
         base.s.ptr = freep = prevp = &base;
         base.s.size = 0;
     }
+
+#if STRATEGY == 2
+    minp = prevp;
+#elif STRATEGY == 3
+    maxp = prevp;
+#endif
+
     for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) {
         if (p->s.size >= nunits) { /* big enough */
             if (p->s.size == nunits) /* exactly */
                 prevp->s.ptr = p->s.ptr;
             else {
+#if STRATEGY == 2
+                if (p->s.size < minp->s.size) {
+                    found_fitting_block = true;
+                    minp = p;
+                    minprevp = prevp;
+                    continue;
+                }
+#elif STRATEGY == 3
+                if (p->s.size > maxp->s.size) {
+                    found_fitting_block = true;
+                    maxp = p;
+                    maxprevp = prevp;
+                    continue;
+                }
+#endif
                 /* allocate tail end */
                 p->s.size -= nunits;
                 p += p->s.size;
@@ -34,9 +69,29 @@ void *malloc(size_t nbytes)
             /* return Data part of block to user */
             return (void *)(p+1); 
         }
-        if (p == freep) /* wrapped around free list */
+        if (p == freep) { /* wrapped around free list */
+#if STRATEGY == 2
+            if (found_fitting_block) {
+                /* allocate tail end */
+                minp->s.size -= nunits;
+                minp += minp->s.size;
+                minp->s.size = nunits;
+                freep = minprevp;
+                return (void *)(minp + 1);
+            }
+#elif STRATEGY == 3
+            if (found_fitting_block) {
+                /* allocate tail end */
+                maxp->s.size -= nunits;
+                maxp += maxp->s.size;
+                maxp->s.size = nunits;
+                freep = maxprevp;
+                return (void *)(maxp + 1);
+            }
+#endif
             if ((p = morecore(nunits)) == NULL)
                 return NULL; /* none left */
+        }
     }
 }
 
