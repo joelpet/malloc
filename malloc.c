@@ -8,6 +8,10 @@ static Header *freep = NULL; /* start of free list */
 /* malloc: general-purpose storage allocator */
 void *malloc(size_t nbytes)
 {
+    if (nbytes == 0) {
+        return NULL;
+    }
+
     Header *p, *prevp;
     Header *moreroce(unsigned);
     unsigned nunits;
@@ -27,12 +31,12 @@ void *malloc(size_t nbytes)
                 p->s.size = nunits;
             }
             freep = prevp;
-            return (void *)(p+1);
+            /* return Data part of block to user */
+            return (void *)(p+1); 
         }
         if (p == freep) /* wrapped around free list */
             if ((p = morecore(nunits)) == NULL)
-                return NULL;
-        /* none left */
+                return NULL; /* none left */
     }
 }
 
@@ -59,8 +63,17 @@ static Header *morecore(unsigned nu)
 /* free: put block ap in free list */
 void free(void *ap)
 {
+    if (ap == NULL) {
+        return;
+    }
+
     Header *bp, *p;
     bp = (Header *)ap - 1;
+
+    if (bp->s.size <= 0) {
+        return;
+    }
+
     /* point to block header */
     for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
         if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
