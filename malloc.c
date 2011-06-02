@@ -9,7 +9,7 @@
 #endif
 
 unsigned int units2bytes(unsigned int nunits) {
-    return (nunits-1)*sizeof(Header) - sizeof(Header)+1;
+    return sizeof(Header) * (nunits-1);
 }
 
 static Header base; /* empty list to get started */
@@ -18,6 +18,8 @@ static Header *freep = NULL; /* start of free list */
 /* malloc: general-purpose storage allocator */
 void *malloc(size_t nbytes)
 {
+    /*fprintf(stderr, "malloc(nbytes=%d)\n", nbytes);*/
+
     Header *p, *prevp;
     Header *moreroce(unsigned);
     unsigned nunits;
@@ -165,18 +167,28 @@ void free(void *ap)
 void *realloc(void *ptr, size_t size) {
     /*printf("realloc(%p, %d)\n", ptr, (int)size);*/
 
-    Header *bp, *p, *nextp, *newp;
+    Header *bp, *p, *nextbp, *newp;
 
     if (ptr == NULL) {
+        /*fprintf(stderr, "ptr == NULL\n");*/
         return malloc(size);
     } else if (size <= 0) {
+        /*fprintf(stderr, "size <= 0\n");*/
         free(ptr);
         return NULL;
     }
 
     bp = (Header*)ptr - 1;
     unsigned int numbytes = units2bytes(bp->s.size);
+    nextbp = bp;
+    nextbp += bp->s.size;
+    /*fprintf(stderr, "%p   %d   %p\n", bp, bp->s.size, nextbp);*/
+    /*unsigned int numbytes = &nextbp - &bp;*/
+    /*fprintf(stderr, "numbytes1 = %u, numbytes2 = %u\n", numbytes, &nextbp - &bp);*/
+
+
     if (size == numbytes) {
+        /*fprintf(stderr, "size == numbytes\n");*/
         return ptr;
     }
 
@@ -229,12 +241,18 @@ void *realloc(void *ptr, size_t size) {
         return NULL;
     }
 
-    /*printf("memcpy\n");*/
-    int bytes_to_copy = numbytes < size ? numbytes : size;
-    memcpy(p, ptr, bytes_to_copy);
-    /*printf("free\n");*/
+    /*fprintf(stderr, "memcpy\n");*/
+    if (size < numbytes) {
+        numbytes = size;
+    }
+    /*fprintf(stderr, "ptr0 = %f\n", ((double*)ptr)[0]);*/
+    /*fprintf(stderr, "numbytes = %d\n", numbytes);*/
+    memcpy(p, ptr, numbytes);
+    /*fprintf(stderr, "p0 = %f\n", ((double*)p)[0]);*/
+    /*fprintf(stderr, "free\n");*/
     free(ptr);
-    /*printf("return");*/
+    /*fprintf(stderr, "p0 = %f\n", ((double*)p)[0]);*/
+    /*fprintf(stderr, "return\n");*/
 
     return p;
 }
