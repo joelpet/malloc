@@ -2,10 +2,15 @@
 #include "malloc.h"
 #include <stdbool.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #ifndef STRATEGY
 #define STRATEGY 1
 #endif
+
+unsigned int units2bytes(unsigned int nunits) {
+    return (nunits-1)*sizeof(Header) - sizeof(Header)+1;
+}
 
 static Header base; /* empty list to get started */
 static Header *freep = NULL; /* start of free list */
@@ -118,6 +123,7 @@ static Header *morecore(unsigned nu)
 /* free: put block ap in free list */
 void free(void *ap)
 {
+    /*printf("free(*ap=%p)\n", ap);*/
     if (ap == NULL) {
         return;
     }
@@ -133,22 +139,31 @@ void free(void *ap)
     for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
         if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
             break; /* freed block at start or end of arena */
+
+    /*printf("after for\n");*/
     if (bp + bp->s.size == p->s.ptr) {
         /* join to upper nbr */
         bp->s.size += p->s.ptr->s.size;
         bp->s.ptr = p->s.ptr->s.ptr;
     } else
         bp->s.ptr = p->s.ptr;
+
+    /*printf("after ifelse1\n");*/
+
     if (p + p->s.size == bp) {
         /* join to lower nbr */
         p->s.size += bp->s.size;
         p->s.ptr = bp->s.ptr;
     } else
         p->s.ptr = bp;
+
+    /*printf("after ifelse\n");*/
+
     freep = p;
 }
 
 void *realloc(void *ptr, size_t size) {
+    /*printf("realloc(%p, %d)\n", ptr, (int)size);*/
 
     Header *bp, *p, *nextp, *newp;
 
@@ -159,11 +174,13 @@ void *realloc(void *ptr, size_t size) {
         return NULL;
     }
 
-    bp = (Header*)ptr-1;
-    if (size == bp->s.size) {
+    bp = (Header*)ptr - 1;
+    unsigned int numbytes = units2bytes(bp->s.size);
+    if (size == numbytes) {
         return ptr;
     }
 
+#if 0
     /* sista blocket i listan (innan det tar slut) */
     if (bp >= bp->s.ptr) {
         /* mallockera mer minne och kopiera data eetc. */
@@ -173,12 +190,12 @@ void *realloc(void *ptr, size_t size) {
     }
     
     /* check if the new block is smaller --> fitts */
-    if (size < bp->s.size) {
+    if (size < numbytes) {
         /* divide the block and update bp */
         nextp = bp->s.ptr;
         newp = bp + size;
         newp->s.ptr = nextp;
-        newp->s.size = bp->s.size-size;
+        newp->s.size = bp->s.size - size;
         bp->s.size = size;
         /* check if there was a perfect fit */
         if (nextp == newp){
@@ -187,6 +204,7 @@ void *realloc(void *ptr, size_t size) {
         }
         return ptr;        
     }
+
     /* check if there is an adjacent block that fitts the new size */
     if (bp->s.size + ptr == bp->s.ptr && bp->s.size >= size - bp->s.size) {
         nextp = bp->s.ptr;
@@ -203,12 +221,21 @@ void *realloc(void *ptr, size_t size) {
         bp->s.size = size;
         
     }
+#endif
 
     /* mallockera mer minne och kopiera data eetc. */
     p = malloc(size);
-    memcpy(ptr, p, size);
+    if (p == NULL) {
+        return NULL;
+    }
+
+    /*printf("memcpy\n");*/
+    int bytes_to_copy = numbytes < size ? numbytes : size;
+    memcpy(p, ptr, bytes_to_copy);
+    /*printf("free\n");*/
     free(ptr);
+    /*printf("return");*/
 
+    return p;
 }
-
 
