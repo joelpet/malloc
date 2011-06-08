@@ -25,12 +25,10 @@ static Header* quick_fit_lists[NRQUICKLISTS];
 static int smallest_block_size_exp = 5;
 
 int get_quick_fit_list_index(unsigned int nbytes) {
-    /*fprintf(stderr, "get_quick_fit_list_index\n");*/
     unsigned int upper_bound;
     int i;
     for (i = 0; i < NRQUICKLISTS; ++i) {
         upper_bound = 2 << (i + smallest_block_size_exp - 1); /* == 2^(i+smallest_block_size_exp) */
-        /*fprintf(stderr, "getindex(nbytes=%d):  nbytes+sizeof=%d, upper_bound=%d\n", nbytes, nbytes + sizeof(Header), upper_bound); */
         if (nbytes + sizeof(Header) <= upper_bound) {
             return i;
         }
@@ -39,7 +37,6 @@ int get_quick_fit_list_index(unsigned int nbytes) {
 }
 
 Header* init_quick_fit_list(int list_index, int num_blocks) {
-    /*fprintf(stderr, "init_quick_fit_list\n");*/
     int i;
     int block_size = 2 << (list_index + smallest_block_size_exp - 1); /* bytes, incl Header */
     int nbytes = num_blocks * block_size;
@@ -52,7 +49,6 @@ Header* init_quick_fit_list(int list_index, int num_blocks) {
     up = (Header *) cp;
 
     int nunits = block_size / sizeof(Header) - 1; /* excl Header */
-    /*fprintf(stderr, "listindex=%d, \tnunits= blocksize=%d / sizeofHeader - 1 = %d\n", list_index, block_size, nunits);*/
 
     /* fixa blocken */
     up->s.ptr = up + 1 + nunits;
@@ -62,7 +58,6 @@ Header* init_quick_fit_list(int list_index, int num_blocks) {
         up = up->s.ptr;
         up->s.ptr = up + 1 + nunits;
         up->s.size = nunits;
-        /*fprintf(stderr, "cur=%p, cursize=%d, next=%p\n", up, up->s.size, up->s.ptr);*/
     }
 
     up->s.ptr = NULL;
@@ -74,8 +69,6 @@ Header* init_quick_fit_list(int list_index, int num_blocks) {
 /* malloc: general-purpose storage allocator */
 void *malloc(size_t nbytes)
 {
-    /*fprintf(stderr, "malloc(nbytes=%d)\n", nbytes);*/
-
     Header *p, *prevp;
     Header *moreroce(unsigned);
     unsigned nunits;
@@ -111,7 +104,6 @@ void *malloc(size_t nbytes)
     }
 
     int list_index = get_quick_fit_list_index(nbytes);
-    /*fprintf(stderr, "malloc: list_index=%d\tnbytes=%d\n", list_index, nbytes);*/
 
     /* kolla om nbytes får plats i någon av quickfit-listorna */
     if (list_index < NRQUICKLISTS) {
@@ -122,7 +114,7 @@ void *malloc(size_t nbytes)
              * - bygger direkt en lista av fria block (i vårt exempel 64 bytes)
              *   som länkas in i fri-listan
              */
-            int num_blocks = 10; /* TODO gör något vettigt istället */
+            int num_blocks = 10; /* TODO ta en multipel av minnessidor istället */
             Header* new_quick_fit_list = init_quick_fit_list(list_index, num_blocks);
             if (new_quick_fit_list == NULL) {
                 return NULL;
@@ -136,15 +128,14 @@ void *malloc(size_t nbytes)
         }
     } else {
         /* som vanligt. */
-        /*fprintf(stderr, "ordinary malloc\n");*/
     }
 #endif
 
-
     for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) {
         if (p->s.size >= nunits) { /* big enough */
-            if (p->s.size == nunits) /* exactly */
+            if (p->s.size == nunits) { /* exactly */
                 prevp->s.ptr = p->s.ptr;
+            }
             else {
 #if STRATEGY == 2
                 if (p->s.size < minp->s.size) {
@@ -224,7 +215,6 @@ void free(void *ap)
     Header* old_first_free;
 #endif
 
-    /*printf("free(*ap=%p)\n", ap);*/
     if (ap == NULL) {
         return;
     }
@@ -238,15 +228,12 @@ void free(void *ap)
 
 #if STRATEGY == 4
     list_index = get_quick_fit_list_index(bp->s.size * sizeof(Header));
-    /*fprintf(stderr, "free: list_index=%d\tnbytes=%d\n", list_index, bp->s.size * sizeof(Header));*/
     if (list_index < NRQUICKLISTS) {
-        /*fprintf(stderr, "freeing in a quick fit free list\n");*/
         old_first_free = quick_fit_lists[list_index];
         quick_fit_lists[list_index] = bp;
         bp->s.ptr = old_first_free;
         return;
     }
-    /*fprintf(stderr, "freeing in ordinary free list\n");*/
 #endif
 
     /* point to block header */
@@ -255,15 +242,12 @@ void free(void *ap)
             break; /* freed block at start or end of arena */
 
 
-    /*printf("after for\n");*/
     if (bp + bp->s.size == p->s.ptr) {
         /* join to upper nbr */
         bp->s.size += p->s.ptr->s.size;
         bp->s.ptr = p->s.ptr->s.ptr;
     } else
         bp->s.ptr = p->s.ptr;
-
-    /*printf("after ifelse1\n");*/
 
     if (p + p->s.size == bp) {
         /* join to lower nbr */
@@ -272,21 +256,15 @@ void free(void *ap)
     } else
         p->s.ptr = bp;
 
-    /*printf("after ifelse\n");*/
-
     freep = p;
 }
 
 void *realloc(void *ptr, size_t size) {
-    /*printf("realloc(%p, %d)\n", ptr, (int)size);*/
-
     Header *bp, *p, *nextbp;
 
     if (ptr == NULL) {
-        /*fprintf(stderr, "ptr == NULL\n");*/
         return malloc(size);
     } else if (size <= 0) {
-        /*fprintf(stderr, "size <= 0\n");*/
         free(ptr);
         return NULL;
     }
@@ -295,13 +273,10 @@ void *realloc(void *ptr, size_t size) {
     unsigned int numbytes = units2bytes(bp->s.size);
     nextbp = bp;
     nextbp += bp->s.size;
-    /*fprintf(stderr, "%p   %d   %p\n", bp, bp->s.size, nextbp);*/
     /*unsigned int numbytes = &nextbp - &bp;*/
-    /*fprintf(stderr, "numbytes1 = %u, numbytes2 = %u\n", numbytes, &nextbp - &bp);*/
 
 
     if (size == numbytes) {
-        /*fprintf(stderr, "size == numbytes\n");*/
         return ptr;
     }
 
@@ -311,18 +286,11 @@ void *realloc(void *ptr, size_t size) {
         return NULL;
     }
 
-    /*fprintf(stderr, "memcpy\n");*/
     if (size < numbytes) {
         numbytes = size;
     }
-    /*fprintf(stderr, "ptr0 = %f\n", ((double*)ptr)[0]);*/
-    /*fprintf(stderr, "numbytes = %d\n", numbytes);*/
     memcpy(p, ptr, numbytes);
-    /*fprintf(stderr, "p0 = %f\n", ((double*)p)[0]);*/
-    /*fprintf(stderr, "free\n");*/
     free(ptr);
-    /*fprintf(stderr, "p0 = %f\n", ((double*)p)[0]);*/
-    /*fprintf(stderr, "return\n");*/
 
     return p;
 }
