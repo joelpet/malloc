@@ -192,49 +192,6 @@ void *realloc(void *ptr, size_t size) {
         return ptr;
     }
 
-#if 0
-    /* sista blocket i listan (innan det tar slut) */
-    if (bp >= bp->s.ptr) {
-        /* mallockera mer minne och kopiera data eetc. */
-        p = malloc(size);
-        memcpy(ptr, p, size);
-        free(ptr);
-    }
-    
-    /* check if the new block is smaller --> fitts */
-    if (size < numbytes) {
-        /* divide the block and update bp */
-        nextp = bp->s.ptr;
-        newp = bp + size;
-        newp->s.ptr = nextp;
-        newp->s.size = bp->s.size - size;
-        bp->s.size = size;
-        /* check if there was a perfect fit */
-        if (nextp == newp){
-          newp->s.size += nextp->s.size;
-          newp->s.ptr = nextp->s.ptr;
-        }
-        return ptr;        
-    }
-
-    /* check if there is an adjacent block that fitts the new size */
-    if (bp->s.size + ptr == bp->s.ptr && bp->s.size >= size - bp->s.size) {
-        nextp = bp->s.ptr;
-        /* perfect fit */
-        if (size == bp->s.size + nextp->s.size) {
-            bp->s.ptr = nextp->s.ptr;
-            bp->s.size = size;
-            return ptr;
-        }
-        /* divide the next block and update bp */
-        newp = bp + size;
-        newp->s.ptr = nextp->s.ptr;
-        newp->s.size = nextp->s.size - (size - bp->s.size);
-        bp->s.size = size;
-        
-    }
-#endif
-
     /* mallockera mer minne och kopiera data eetc. */
     p = malloc(size);
     if (p == NULL) {
