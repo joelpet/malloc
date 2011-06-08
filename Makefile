@@ -12,7 +12,7 @@ CC=gcc
 CFLAGS=
 
 # What allocation strategy to use.
-STRATEGY=2
+STRATEGY=4
 
 # Default plus extra flags for C preprocessor and compiler.
 all_cflags=$(CFLAGS) -Wall -Wextra -g -ansi -DSTRATEGY=$(STRATEGY)
@@ -25,7 +25,7 @@ MALLOC=malloc.c
 ## =====================
 
 # Source files to compile and link together
-srcs=malloc.c tstalgorithms.c tstcrash.c tstcrash_complex.c tstcrash_simple.c \
+srcs=$(MALLOC) tstalgorithms.c tstcrash.c tstcrash_complex.c tstcrash_simple.c \
 	 tstextreme.c tstmalloc.c tstmemory.c tstmerge.c tstrealloc.c
 
 # Deduce object files from source files
