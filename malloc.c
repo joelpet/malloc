@@ -12,6 +12,8 @@
 #define NRQUICKLISTS 4
 #endif
 
+#define POW2(E) 2 << (E - 1)
+
 unsigned int units2bytes(unsigned int nunits) {
     return sizeof(Header) * (nunits-1);
 }
@@ -24,45 +26,56 @@ static bool first_run = true;
 static Header* quick_fit_lists[NRQUICKLISTS];
 static int smallest_block_size_exp = 5;
 
+/**
+ * Returns the index of the quick fit list that the given number of bytes fit
+ * into. Assumes that a quick fit list with upper bound N can hold N bytes of
+ * data.
+ */
 int get_quick_fit_list_index(unsigned int nbytes) {
     unsigned int upper_bound;
     int i;
     for (i = 0; i < NRQUICKLISTS; ++i) {
-        upper_bound = 2 << (i + smallest_block_size_exp - 1); /* == 2^(i+smallest_block_size_exp) */
-        if (nbytes + sizeof(Header) <= upper_bound) {
+        upper_bound = POW2(i + smallest_block_size_exp);
+        if (nbytes <= upper_bound) {
             return i;
         }
     }
     return NRQUICKLISTS;
 }
 
-Header* init_quick_fit_list(int list_index, int num_blocks) {
-    int i;
-    int block_size = 2 << (list_index + smallest_block_size_exp - 1); /* bytes, incl Header */
-    int nbytes = num_blocks * block_size;
+/**
+ * Gets more system from memory and initiates blocks of the appropriate fixed
+ * size.
+ */
+Header* init_quick_fit_list(int list_index) {
+    int i, nbytes, num_blocks;
+    unsigned nunits;
+    /* total block size in bytes, incl Header */
+    int block_size = POW2(list_index + smallest_block_size_exp); 
+    int block_size_units = (block_size+sizeof(Header)-1)/sizeof(Header) + 1;
+    Header* p, *basep;
 
-    char *cp;
-    Header *up;
-    cp = sbrk(nbytes);/* TODO rätt? */
-    if (cp == (char *) -1) /* no space at all */
+    /* Number of bytes and corresponding units count to ask the system for. */
+    nbytes = sysconf(_SC_PAGESIZE);
+    if (nbytes < 0) {
         return NULL;
-    up = (Header *) cp;
+    }
+    nunits = nbytes / sizeof(Header);
+    num_blocks = nunits / block_size_units;
+    basep = p = morecore(nunits);
 
-    int nunits = block_size / sizeof(Header) - 1; /* excl Header */
-
-    /* fixa blocken */
-    up->s.ptr = up + 1 + nunits;
-    up->s.size = nunits;
-
-    for (i = 1; i < num_blocks; ++i) {
-        up = up->s.ptr;
-        up->s.ptr = up + 1 + nunits;
-        up->s.size = nunits;
+    /* Initiate blocks. */
+    for (i = 0; i < num_blocks - 1; ++i) {
+        p->s.size = block_size_units;
+        p->s.ptr = p + block_size_units;
+        p = p->s.ptr;
     }
 
-    up->s.ptr = NULL;
+    /* Treat last block differently (link to NULL, but same size). */
+    p->s.ptr = NULL;
+    p->s.size = block_size_units;
 
-    return (Header *) cp;
+    return basep;
 }
 #endif
 
@@ -114,8 +127,7 @@ void *malloc(size_t nbytes)
              * - bygger direkt en lista av fria block (i vårt exempel 64 bytes)
              *   som länkas in i fri-listan
              */
-            int num_blocks = 10; /* TODO ta en multipel av minnessidor istället */
-            Header* new_quick_fit_list = init_quick_fit_list(list_index, num_blocks);
+            Header* new_quick_fit_list = init_quick_fit_list(list_index);
             if (new_quick_fit_list == NULL) {
                 return NULL;
             } else {
