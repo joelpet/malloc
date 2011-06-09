@@ -123,25 +123,21 @@ void *malloc(size_t nbytes)
     if (list_index < NRQUICKLISTS) {
         /* kolla om den listan redan är initierad OCH det finns ett ledigt block */
         if (quick_fit_lists[list_index].s.ptr == NULL) {
-            /*
+            /* Om inte:
              * - fråga systemet om lämpligt mkt mer minne
-             * - bygger direkt en lista av fria block (i vårt exempel 64 bytes)
-             *   som länkas in i fri-listan
+             * - bygg direkt en lista av fria block
              */
             Header* new_quick_fit_list = init_quick_fit_list(list_index);
             if (new_quick_fit_list == NULL) {
                 return NULL;
             } else {
-                quick_fit_lists[list_index].s.ptr = new_quick_fit_list;
+                quick_fit_lists[list_index] = *new_quick_fit_list;
             }
-        } else {
-            /* Should return a void pointer to the data part. */
-            void* pointer_to_return = (void *)(quick_fit_lists[list_index].s.ptr + 1);
-            quick_fit_lists[list_index].s.ptr = quick_fit_lists[list_index].s.ptr->s.ptr;
-            return pointer_to_return;
         }
-    } else {
-        /* som vanligt. */
+        /* Should return a void pointer to the data part. */
+        void* pointer_to_return = (void *)(quick_fit_lists[list_index].s.ptr + 1);
+        quick_fit_lists[list_index].s.ptr = quick_fit_lists[list_index].s.ptr->s.ptr;
+        return pointer_to_return;
     }
 #endif
 
