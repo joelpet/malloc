@@ -23,7 +23,7 @@ static Header *freep = NULL; /* start of free list */
 
 #if STRATEGY == 4
 static bool first_run = true;
-static Header* quick_fit_lists[NRQUICKLISTS];
+static Header quick_fit_lists[NRQUICKLISTS];
 static int smallest_block_size_exp = 5;
 
 /**
@@ -111,7 +111,8 @@ void *malloc(size_t nbytes)
     int i;
     if (first_run) {
         for (i = 0; i < NRQUICKLISTS; ++i) {
-            quick_fit_lists[i] = NULL;
+            quick_fit_lists[i].s.ptr = NULL;
+            quick_fit_lists[i].s.size = 0;
         }
         first_run = false;
     }
@@ -121,7 +122,7 @@ void *malloc(size_t nbytes)
     /* kolla om nbytes får plats i någon av quickfit-listorna */
     if (list_index < NRQUICKLISTS) {
         /* kolla om den listan redan är initierad OCH det finns ett ledigt block */
-        if (quick_fit_lists[list_index] == NULL) {
+        if (quick_fit_lists[list_index].s.ptr == NULL) {
             /*
              * - fråga systemet om lämpligt mkt mer minne
              * - bygger direkt en lista av fria block (i vårt exempel 64 bytes)
@@ -131,11 +132,12 @@ void *malloc(size_t nbytes)
             if (new_quick_fit_list == NULL) {
                 return NULL;
             } else {
-                quick_fit_lists[list_index] = new_quick_fit_list;
+                quick_fit_lists[list_index].s.ptr = new_quick_fit_list;
             }
         } else {
-            void* pointer_to_return = (void *)(quick_fit_lists[list_index] + 1);
-            quick_fit_lists[list_index] = quick_fit_lists[list_index]->s.ptr;
+            /* Should return a void pointer to the data part. */
+            void* pointer_to_return = (void *)(quick_fit_lists[list_index].s.ptr + 1);
+            quick_fit_lists[list_index].s.ptr = quick_fit_lists[list_index].s.ptr->s.ptr;
             return pointer_to_return;
         }
     } else {
@@ -241,8 +243,8 @@ void free(void *ap)
 #if STRATEGY == 4
     list_index = get_quick_fit_list_index(bp->s.size * sizeof(Header));
     if (list_index < NRQUICKLISTS) {
-        old_first_free = quick_fit_lists[list_index];
-        quick_fit_lists[list_index] = bp;
+        old_first_free = quick_fit_lists[list_index].s.ptr;
+        quick_fit_lists[list_index].s.ptr = bp;
         bp->s.ptr = old_first_free;
         return;
     }
