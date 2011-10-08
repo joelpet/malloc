@@ -1,3 +1,6 @@
+#ifndef _malloc_h_
+#define _malloc_h_
+
 #include <string.h>
 
 typedef long Align; /* for alignment to long boundary */
@@ -18,3 +21,5 @@ void *malloc(size_t size);
 void free(void *ptr);
 void *realloc(void *ptr, size_t size);
 static Header *morecore(unsigned nu);
+
+#endif /* _malloc_h */

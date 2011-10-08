@@ -20,6 +20,7 @@ all_cflags=$(CFLAGS) -Wall -Wextra -g -ansi -DSTRATEGY=$(STRATEGY)
 # Malloc source file to use. Set to empty (with `make MALLOC=`) for system default.
 MALLOC=malloc.c
 
+
 ##################################################
 ## Setup files variables
 ## =====================
@@ -27,9 +28,6 @@ MALLOC=malloc.c
 # Source files to compile and link together
 srcs=$(MALLOC) tstalgorithms.c tstcrash.c tstcrash_complex.c tstcrash_simple.c \
 	 tstextreme.c tstmalloc.c tstmemory.c tstmerge.c tstrealloc.c
-
-# Deduce object files from source files
-objs=$(srcs:.c=.o)
 
 # Executables
 execs=$(patsubst tst%.c, tst%, $(filter tst%.c, $(srcs)))
