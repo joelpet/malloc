@@ -3,6 +3,10 @@ static bool first_run = true;
 static Header* quick_fit_lists[NRQUICKLISTS];
 static int smallest_block_size_exp = 5;
 
+/**
+ * Calculates the quick fit list index for the given number of bytes of data to
+ * allocate (adding the size of the header in the calculations).
+ */
 int get_quick_fit_list_index(unsigned int nbytes) {
     unsigned int upper_bound;
     int i;
@@ -49,66 +53,42 @@ void *malloc_quick(size_t nbytes)
     Header *p, *prevp;
     Header *moreroce(unsigned);
     unsigned nunits;
+    int list_index, i;
 
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
-    if ((prevp = freep) == NULL) { /* no free list yet */
-        base.s.ptr = freep = prevp = &base;
-        base.s.size = 0;
+    list_index = get_quick_fit_list_index(nbytes);
+
+    /* Use another strategy for too large allocations. */
+    if (list_index >= NRQUICKLISTS) {
+        return malloc_first(nbytes);
     }
 
-    int i;
     if (first_run) {
+        /* Initialize the quick fit lists on first run. */
         for (i = 0; i < NRQUICKLISTS; ++i) {
             quick_fit_lists[i] = NULL;
         }
         first_run = false;
     }
 
-    int list_index = get_quick_fit_list_index(nbytes);
 
-    /* kolla om nbytes får plats i någon av quickfit-listorna */
-    if (list_index < NRQUICKLISTS) {
-        /* kolla om den listan redan är initierad OCH det finns ett ledigt block */
-        if (quick_fit_lists[list_index] == NULL) {
-            /*
-             * - fråga systemet om lämpligt mkt mer minne
-             * - bygger direkt en lista av fria block (i vårt exempel 64 bytes)
-             *   som länkas in i fri-listan
-             */
-            int num_blocks = 10; /* TODO ta en multipel av minnessidor istället */
-            Header* new_quick_fit_list = init_quick_fit_list(list_index, num_blocks);
-            if (new_quick_fit_list == NULL) {
-                return NULL;
-            } else {
-                quick_fit_lists[list_index] = new_quick_fit_list;
-            }
+    /* kolla om quick fit-listan redan är initierad OCH det finns ett ledigt block */
+    if (quick_fit_lists[list_index] == NULL) {
+        /*
+         * - fråga systemet om lämpligt mkt mer minne
+         * - bygger direkt en lista av fria block (i vårt exempel 64 bytes)
+         *   som länkas in i fri-listan
+         */
+        int num_blocks = 10; /* TODO ta en multipel av minnessidor istället */
+        Header* new_quick_fit_list = init_quick_fit_list(list_index, num_blocks);
+        if (new_quick_fit_list == NULL) {
+            return NULL;
         } else {
-            void* pointer_to_return = (void *)(quick_fit_lists[list_index] + 1);
-            quick_fit_lists[list_index] = quick_fit_lists[list_index]->s.ptr;
-            return pointer_to_return;
+            quick_fit_lists[list_index] = new_quick_fit_list;
         }
-    } else {
-        /* som vanligt. */
     }
 
-    for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) {
-        if (p->s.size >= nunits) { /* big enough */
-            if (p->s.size == nunits) { /* exactly */
-                prevp->s.ptr = p->s.ptr;
-            }
-            else {
-                /* allocate tail end */
-                p->s.size -= nunits;
-                p += p->s.size;
-                p->s.size = nunits;
-            }
-            freep = prevp;
-            /* return Data part of block to user */
-            return (void *)(p+1); 
-        }
-        if (p == freep) { /* wrapped around free list */
-            if ((p = morecore(nunits)) == NULL)
-                return NULL; /* none left */
-        }
-    }
+    void* pointer_to_return = (void *)(quick_fit_lists[list_index] + 1);
+    quick_fit_lists[list_index] = quick_fit_lists[list_index]->s.ptr;
+    return pointer_to_return;
 }

@@ -17,15 +17,10 @@ static Header base; /* empty list to get started */
 static Header *freep = NULL; /* start of free list */
 
 /* Include the different malloc implementation source files here. */
-#if   STRATEGY == 1
 #include "first.c"
-#elif STRATEGY == 2
 #include "best.c"
-#elif STRATEGY == 3
 #include "worst.c"
-#elif STRATEGY == 4
 #include "quick.c"
-#endif
 
 
 /* malloc: general-purpose storage allocator */
