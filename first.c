@@ -1,9 +1,3 @@
-#include "brk.h"
-#include "malloc.h"
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 void *malloc_first(size_t nbytes) {
     Header *p, *prevp;
