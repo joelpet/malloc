@@ -50,10 +50,6 @@ void *malloc_quick(size_t nbytes)
     Header *moreroce(unsigned);
     unsigned nunits;
 
-    if (nbytes == 0) {
-        return NULL;
-    }
-
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
     if ((prevp = freep) == NULL) { /* no free list yet */
         base.s.ptr = freep = prevp = &base;

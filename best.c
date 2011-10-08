@@ -7,10 +7,6 @@ void *malloc_best(size_t nbytes)
     Header *minp, *minprevp;
     bool found_fitting_block = false;
 
-    if (nbytes == 0) {
-        return NULL;
-    }
-
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
     if ((prevp = freep) == NULL) { /* no free list yet */
         base.s.ptr = freep = prevp = &base;

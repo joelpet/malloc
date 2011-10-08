@@ -30,6 +30,10 @@ static Header *freep = NULL; /* start of free list */
 
 /* malloc: general-purpose storage allocator */
 void *malloc(size_t nbytes) {
+    if (nbytes == 0) {
+        return NULL;
+    }
+
 #if   STRATEGY == 1
     return malloc_first(nbytes);
 #elif STRATEGY == 2

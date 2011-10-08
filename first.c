@@ -1,12 +1,9 @@
 
-void *malloc_first(size_t nbytes) {
+void *malloc_first(size_t nbytes) 
+{
     Header *p, *prevp;
     Header *moreroce(unsigned);
     unsigned nunits;
-
-    if (nbytes == 0) {
-        return NULL;
-    }
 
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
     if ((prevp = freep) == NULL) { /* no free list yet */
