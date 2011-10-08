@@ -124,8 +124,8 @@ void *realloc(void *ptr, size_t size) {
         return NULL;
     }
 
-    bp = (Header*)ptr - 1;
-    unsigned int numbytes = sizeof(Header) * (bp->s.size-1);
+    bp = (Header*) ptr - 1;
+    unsigned int numbytes = sizeof(Header) * bp->s.size;
 
     if (size == numbytes) {
         return ptr;
