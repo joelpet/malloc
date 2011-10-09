@@ -42,15 +42,15 @@ Header* init_quick_fit_list(int list_index) {
         return NULL;
     up = (Header *) cp;
 
-    int nunits = block_size / sizeof(Header) - 1; /* excl Header */
+    int nunits = block_size / sizeof(Header);
 
     /* fixa blocken */
-    up->s.ptr = up + 1 + nunits;
+    up->s.ptr = up + nunits;
     up->s.size = nunits;
 
     for (i = 1; i < num_blocks; ++i) {
         up = up->s.ptr;
-        up->s.ptr = up + 1 + nunits;
+        up->s.ptr = up + nunits;
         up->s.size = nunits;
     }
 
