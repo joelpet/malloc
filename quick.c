@@ -1,3 +1,4 @@
+#define POW2(E) 2 << (E - 1)
 
 static bool first_run = true;
 static Header* quick_fit_lists[NRQUICKLISTS];
@@ -11,7 +12,7 @@ int get_quick_fit_list_index(unsigned int nbytes) {
     unsigned int upper_bound;
     int i;
     for (i = 0; i < NRQUICKLISTS; ++i) {
-        upper_bound = 2 << (i + smallest_block_size_exp - 1); /* == 2^(i+smallest_block_size_exp) */
+        upper_bound = POW2(i + smallest_block_size_exp);
         if (nbytes + sizeof(Header) <= upper_bound) {
             return i;
         }
@@ -19,14 +20,24 @@ int get_quick_fit_list_index(unsigned int nbytes) {
     return NRQUICKLISTS;
 }
 
-Header* init_quick_fit_list(int list_index, int num_blocks) {
+/**
+ * Gets more system from memory and initiates blocks of correct size.
+ */
+Header* init_quick_fit_list(int list_index) {
     int i;
-    int block_size = 2 << (list_index + smallest_block_size_exp - 1); /* bytes, incl Header */
-    int nbytes = num_blocks * block_size;
+
+    int block_size = POW2(list_index + smallest_block_size_exp); /* bytes, incl Header */
+    int nbytes = sysconf(_SC_PAGESIZE);
+    if (nbytes < 0) {
+        return NULL;
+    }
+    /* Make sure at least one block fits */
+    nbytes += (block_size / nbytes) * nbytes;
+    int num_blocks = nbytes / block_size;
 
     char *cp;
     Header *up;
-    cp = sbrk(nbytes);/* TODO rätt? */
+    cp = sbrk(nbytes);
     if (cp == (char *) -1) /* no space at all */
         return NULL;
     up = (Header *) cp;
@@ -79,8 +90,7 @@ void *malloc_quick(size_t nbytes)
          * - bygger direkt en lista av fria block (i vårt exempel 64 bytes)
          *   som länkas in i fri-listan
          */
-        int num_blocks = 10; /* TODO ta en multipel av minnessidor istället */
-        Header* new_quick_fit_list = init_quick_fit_list(list_index, num_blocks);
+        Header* new_quick_fit_list = init_quick_fit_list(list_index);
         if (new_quick_fit_list == NULL) {
             return NULL;
         } else {
