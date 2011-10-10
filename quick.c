@@ -50,7 +50,9 @@ Header* init_quick_fit_list(int list_index) {
         up = up->s.ptr;
     }
 
+    /* Let the last block point to NULL, but still with correct size. */
     up->s.ptr = NULL;
+    up->s.size = nunits;
 
     return (Header *) cp;
 }
