@@ -9,13 +9,13 @@ SHELL=/bin/sh
 CC=gcc
 
 # Extra flags to give to the C preprocessor and programs that use it (the C and Fortran compilers). 
-CFLAGS=-g
+CFLAGS=
 
 # What allocation strategy to use.
 STRATEGY=4
 
 # Default plus extra flags for C preprocessor and compiler.
-all_cflags=$(CFLAGS) -Wall -Wextra -ansi -DSTRATEGY=$(STRATEGY)
+all_cflags=$(CFLAGS) -Wall -Wextra -ansi -O4 -DSTRATEGY=$(STRATEGY)
 
 # Malloc source file to use. Set to empty (with `make MALLOC=`) for system default.
 MALLOC=malloc.c
