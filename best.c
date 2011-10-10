@@ -4,7 +4,7 @@ void *malloc_best(size_t nbytes)
     Header *p, *prevp;
     Header *moreroce(unsigned);
     unsigned nunits;
-    Header *minp, *minprevp;
+    Header *minp, *minprevp = NULL;
     bool found_fitting_block = false;
 
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;

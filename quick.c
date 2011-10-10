@@ -59,7 +59,6 @@ Header* init_quick_fit_list(int list_index) {
 
 void *malloc_quick(size_t nbytes)
 {
-    Header *p, *prevp;
     Header *moreroce(unsigned);
     unsigned nunits;
     int list_index, i;
