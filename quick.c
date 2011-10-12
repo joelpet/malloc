@@ -55,7 +55,9 @@ int get_quick_fit_list_index(
  * the list.
  *
  */
-Header* init_quick_fit_list(int list_index) {
+Header* init_quick_fit_list(
+        int list_index) /* the index of the quick fit list to initialize */
+{
     int i;
 
     /*
@@ -107,7 +109,8 @@ Header* init_quick_fit_list(int list_index) {
  * malloc_quick returns the start address of the newly allocated memory.
  *
  */
-void *malloc_quick(size_t nbytes)
+void *malloc_quick(
+        size_t nbytes) /* number of bytes of memory to allocate */
 {
     Header *moreroce(unsigned);
     unsigned nunits;
