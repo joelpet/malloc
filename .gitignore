@@ -1,4 +1,5 @@
 *.o
+nbproject/
 
 # The following two lines ignores all files starting with "tst" except from such .c files.
 tst*
