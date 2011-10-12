@@ -1,5 +1,19 @@
+/* malloc_best
+ *
+ * This module contains the function that implements the Worst fit malloc
+ * strategy, malloc_worst().
+ *
+ */
 
-void *malloc_worst(size_t nbytes)
+/* malloc_worst
+ *
+ * malloc_worst returns the start address of the newly allocated memory.
+ * It implements the Worst fit algorithm, which tries to find a free memory
+ * block that is as large as possible.
+ *
+ */
+void *malloc_worst(
+        size_t nbytes) /* number of bytes of memory to allocate */
 {
     Header *p, *prevp;
     Header *moreroce(unsigned);
@@ -14,6 +28,12 @@ void *malloc_worst(size_t nbytes)
     }
 
     maxp = prevp;
+
+
+    /*
+     * Iterate over the free list and find the largest block, that is large
+     * enough to hold nbytes of data.
+     */
 
     for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) {
         if (p->s.size >= nunits) { /* big enough */
