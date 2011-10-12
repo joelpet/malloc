@@ -1,5 +1,19 @@
+/* best fit malloc
+ *
+ * This module contains the function that implements the Best fit malloc
+ * strategy, malloc_best().
+ *
+ */
 
-void *malloc_best(size_t nbytes)
+/* malloc_best
+ *
+ * malloc_best returns the start address of the newly allocated memory.
+ * It implements the Best fit algorithm, which tries to find the smallest free
+ * block that is large enough.
+ *
+ */
+void *malloc_best(
+    size_t nbytes) /* number of bytes of memory to allocate */
 {
     Header *p, *prevp;
     Header *moreroce(unsigned);
@@ -14,6 +28,12 @@ void *malloc_best(size_t nbytes)
     }
 
     minp = prevp;
+
+
+    /*
+     * Iterate over the free list and find the smallest block that is large
+     * enough to hold nbytes of data.
+     */
 
     for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) {
         if (p->s.size >= nunits) { /* big enough */
