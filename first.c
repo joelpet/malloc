@@ -1,5 +1,20 @@
+/* first fit malloc
+ *
+ * This module contains the function that implements the First fit malloc
+ * strategy, malloc_first().
+ *
+ */
 
-void *malloc_first(size_t nbytes) 
+
+/* malloc_first
+ *
+ * malloc_first returns the start address of the newly allocated memory.
+ * It implements the First fit algorithm, which simply returns the first free
+ * memory that is large enough.
+ *
+ */
+void *malloc_first(
+        size_t nbytes) /* number of bytes of memory to allocate */
 {
     Header *p, *prevp;
     Header *moreroce(unsigned);
@@ -10,6 +25,12 @@ void *malloc_first(size_t nbytes)
         base.s.ptr = freep = prevp = &base;
         base.s.size = 0;
     }
+
+
+    /*
+     * Iterate over the free list and find a block that is large enough to hold
+     * nbytes of data.
+     */
 
     for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) {
         if (p->s.size >= nunits) { /* big enough */
