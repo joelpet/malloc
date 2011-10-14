@@ -35,12 +35,6 @@ void *malloc_best(
      * enough to hold nbytes of data.
      */
 
-
-    /*
-     * Iterate over the free list and find the smallest block that is large
-     * enough to hold nbytes of data.
-     */
-
     for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) {
         if (p->s.size >= nunits) { /* big enough */
             if (p->s.size == nunits) { /* exactly */
