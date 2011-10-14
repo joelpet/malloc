@@ -3,6 +3,29 @@
 
 #include <string.h>
 
+/*
+ * The strategy (allocation algorithm) to use. Choose from:
+ * 1) First fit
+ * 2) Best fit
+ * 3) Worst fit
+ * 4) Quick fit
+ */
+#ifndef STRATEGY
+#define STRATEGY 1
+#endif
+
+/*
+ * The number of lists to use in the Quick fit algorithm implementation.
+ */
+#ifndef NRQUICKLISTS
+#define NRQUICKLISTS 4
+#endif
+
+/*
+ * The minimum #units to request when asking system for more memory.
+ */
+#define NALLOC 1024
+
 typedef long Align; /* for alignment to long boundary */
 
 union header {
