@@ -8,14 +8,15 @@ SHELL=/bin/sh
 # Program for compiling C programs. 
 CC=gcc
 
-# Extra flags to give to the C preprocessor and programs that use it (the C and Fortran compilers). 
-CFLAGS=-g
-
-# What allocation strategy to use.
+# What allocation strategy to use, and number of quick fit lists.
 STRATEGY=4
+NRQUICKLISTS=6
+
+# Extra flags to give to the C preprocessor and programs that use it (the C and Fortran compilers). 
+CFLAGS=-DSTRATEGY=$(STRATEGY) -DNRQUICKLISTS=$(NRQUICKLISTS)
 
 # Default plus extra flags for C preprocessor and compiler.
-all_cflags=$(CFLAGS) -Wall -Wextra -ansi -DSTRATEGY=$(STRATEGY)
+all_cflags=$(CFLAGS) -Wall -Wextra -ansi -O4
 
 # Malloc source file to use. Set to empty (with `make MALLOC=`) for system default.
 MALLOC=malloc.c
@@ -27,7 +28,8 @@ MALLOC=malloc.c
 
 # Source files to compile and link together
 srcs=$(MALLOC) tstalgorithms.c tstcrash.c tstcrash_complex.c tstcrash_simple.c \
-	 tstextreme.c tstmalloc.c tstmemory.c tstmerge.c tstrealloc.c
+	 tstextreme.c tstmalloc.c tstmemory.c tstmerge.c tstrealloc.c \
+	 tstbestcase.c
 
 # Executables
 execs=$(patsubst tst%.c, tst%, $(filter tst%.c, $(srcs)))
