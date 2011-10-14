@@ -20,8 +20,7 @@ void *malloc_best(
 {
     Header *p, *prevp;
     Header *moreroce(unsigned);
-    unsigned nunits;
-    int min_size = INT_MAX;
+    unsigned nunits, min_size = INT_MAX;
     Header *minp = NULL, *minprevp = NULL;
 
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
@@ -29,8 +28,6 @@ void *malloc_best(
         base.s.ptr = freep = prevp = &base;
         base.s.size = 0;
     }
-
-    minp = NULL;
 
 
     /*
