@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Running this script will delete data files from previous run. Continue? [Y/n]"
+echo -n "Running this script will delete data files from previous run. Continue? [Y/n]"
 read run
 if [[ $run != "" && $run != "Y" && $run != "y" ]]; then exit; fi
 
@@ -10,7 +10,7 @@ if [ $# -ne 1 ]; then
 fi
 
 strategy="0 1 2 3 4"
-iterations="10000 20000 30000 40000 50000 60000"
+iterations="20000 40000 60000 80000 100000"
 runs=`seq 5`
 program="$1"
 
