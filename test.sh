@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "Running this script will delete data files from previous run. Continue? [Y/n]"
+read run
+if [[ $run != "" && $run != "Y" && $run != "y" ]]; then exit; fi
+
 if [ $# -ne 1 ]; then
     echo "Usage: $0 <program>"
     exit
@@ -9,17 +13,6 @@ strategy="0 1 2 3 4"
 iterations="10000 20000 30000 40000 50000 60000"
 runs=`seq 5`
 program="$1"
-
-echo "Running this script will delete data files from previous run. Continue? [Y/n]"
-read run
-
-if [[ $run != "" && $run != "Y" && $run != "y" ]]; then
-    exit
-fi
-
-
-#sim_time[$j]=$($executable -n $n | grep -o "simulation time = [0-9.]* seconds" | awk '{print $4}')
-#median=$(echo ${sim_time[1]} ${sim_time[2]} ${sim_time[3]} ${sim_time[4]} ${sim_time[5]} | tr " " "\n" | sort | head -n 3 | tail -n 1)
 
 rm -f make_output
 
