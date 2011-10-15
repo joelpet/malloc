@@ -10,7 +10,7 @@ if [ $# -ne 1 ]; then
 fi
 
 strategy="0 1 2 3 4"
-iterations="20000 40000 60000 80000 100000"
+iterations="16384 32768 65536 131072 262144"
 runs=`seq 5`
 program="$1"
 

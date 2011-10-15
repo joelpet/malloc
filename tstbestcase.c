@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#define MAX_NUM_ITERATIONS 100000
+#define MAX_NUM_ITERATIONS 500000
 #define SIZE_MIN_EXP 2
 #define SIZE_EXP_SPAN 12
 
@@ -16,7 +16,11 @@ int main(
     int num_iterations = (argc > 1) ? atoi(argv[1]) : MAX_NUM_ITERATIONS;
     int i, j, lowbreak, highbreak;
     MemoryBlock mem_blocks[MAX_NUM_ITERATIONS];
-    num_iterations = num_iterations > MAX_NUM_ITERATIONS ? MAX_NUM_ITERATIONS : num_iterations;
+
+    if (num_iterations > MAX_NUM_ITERATIONS) {
+        fprintf(stderr, "Warning: num_iterations larger than MAX_NUM_ITERATIONS, setting it to %d.\n", MAX_NUM_ITERATIONS);
+        num_iterations = MAX_NUM_ITERATIONS;
+    }
 
     for (i = 0; i < num_iterations; ++i) {
         mem_blocks[i].ptr = NULL;
