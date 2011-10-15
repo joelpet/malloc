@@ -4,18 +4,13 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#define MAX_NUM_ITERATIONS 500000
-#define SIZE_MIN_EXP 2
-#define SIZE_EXP_SPAN 12
-
 
 int main(
         int argc,
         char *argv[])
 {
     int num_iterations = (argc > 1) ? atoi(argv[1]) : MAX_NUM_ITERATIONS;
-    int i, j;
-    void *lowbreak, *highbreak;
+    int i, j, lowbreak, highbreak;
     MemoryBlock mem_blocks[MAX_NUM_ITERATIONS];
 
     if (num_iterations > MAX_NUM_ITERATIONS) {
@@ -45,13 +40,13 @@ int main(
         }
     }
 
+
     /*
      * Free the allocated memory.
      */
 
     for (i = 0; i < num_iterations; ++i) {
         free(mem_blocks[i].ptr);
-        mem_blocks[i].ptr = NULL;
     }
 
     highbreak = sbrk(0);
@@ -61,7 +56,7 @@ int main(
      * Print the statistics.
      */
 
-    fprintf(stderr, "Memory usage: %u b\n", (unsigned) (highbreak - lowbreak));
+    fprintf(stderr, "Memory usage: %u b\n", highbreak - lowbreak);
 
     return 0;
 }

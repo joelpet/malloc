@@ -29,7 +29,7 @@ MALLOC=malloc.c
 # Source files to compile and link together
 srcs=$(MALLOC) tstalgorithms.c tstcrash.c tstcrash_complex.c tstcrash_simple.c \
 	 tstextreme.c tstmalloc.c tstmemory.c tstmerge.c tstrealloc.c \
-	 tstbestcase.c
+	 tstbestcase.c tstworstcase.c
 
 # Executables
 execs=$(patsubst tst%.c, tst%, $(filter tst%.c, $(srcs)))

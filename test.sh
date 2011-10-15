@@ -10,7 +10,7 @@ if [ $# -ne 1 ]; then
 fi
 
 strategy="0 1 2 3 4"
-iterations="16384 32768 65536 131072 262144"
+iterations="100000 120000 140000 160000 180000 200000"
 runs=`seq 5`
 program="$1"
 
@@ -35,15 +35,16 @@ for s in $strategy; do
     dat_file="`basename ${program}`.$s.dat"
     rm -f $dat_file
 
-    echo "# Iterations\tMemory\tTime" >> $dat_file
+    printf "# Iterations\tMemory\tTime (CPU seconds, user + kernel mode)\n" | tee -a $dat_file
 
     for i in $iterations; do
 
         # Run the test a couple of times.
         for j in $runs; do
-            output=$(/usr/bin/time --format="Time: %e\n" $program $i 2>&1)
+            # Measure user mode + kernel mode CPU-seconds.
+            output=$(/usr/bin/time --format="Time: %U %S\n" $program $i 2>&1)
             m[$j]=$(echo "$output" | grep -o "Memory usage: [0-9]* b" | awk '{print $3}')
-            t[$j]=$(echo "$output" | grep -o "Time: [0-9]*.[0-9]*" | awk '{print $2}')
+            t[$j]=$(echo "$output" | grep -o "Time: [0-9]*.[0-9]* [0-9]*.[0-9]*" | awk '{print $2 + $3}')
         done
 
         m_median=$(echo ${m[1]} ${m[2]} ${m[3]} ${m[4]} ${m[5]} | tr " " "\n" | sort | head -n 3 | tail -n 1)
