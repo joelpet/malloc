@@ -11,6 +11,7 @@ fi
 
 strategy="0 1 2 3 4"
 iterations="100000 120000 140000 160000 180000 200000"
+#iterations="40000 42000 44000 46000 48000 50000" # used for ./tstworstcase
 runs=`seq 5`
 program="$1"
 
