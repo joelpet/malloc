@@ -7,3 +7,4 @@ make_output
 tst*
 !tst*.c
 !tst*.h
+!tst*.gnuplot
