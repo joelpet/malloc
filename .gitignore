@@ -3,6 +3,7 @@ nbproject/
 make_output
 *.png
 
-# The following two lines ignores all files starting with "tst" except from such .c files.
+# The following two lines ignores all files starting with "tst" except from such .c or .h files.
 tst*
 !tst*.c
+!tst*.h
