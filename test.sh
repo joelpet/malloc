@@ -50,7 +50,7 @@ for s in $strategy; do
         m_median=$(echo ${m[1]} ${m[2]} ${m[3]} ${m[4]} ${m[5]} | tr " " "\n" | sort | head -n 3 | tail -n 1)
         t_median=$(echo ${t[1]} ${t[2]} ${t[3]} ${t[4]} ${t[5]} | tr " " "\n" | sort | head -n 3 | tail -n 1)
 
-        printf "%d\t%10d\t%f\n" $i $m_median $t_median | tee -a $dat_file
+        printf "%d\t%11d\t%f\n" $i $m_median $t_median | tee -a $dat_file
     done
 done
 

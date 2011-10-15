@@ -10,7 +10,8 @@ int main(
         char *argv[])
 {
     int num_iterations = (argc > 1) ? atoi(argv[1]) : MAX_NUM_ITERATIONS;
-    int i, j, lowbreak, highbreak;
+    int i, j;
+    unsigned lowbreak, highbreak;
     MemoryBlock mem_blocks[MAX_NUM_ITERATIONS];
 
     if (num_iterations > MAX_NUM_ITERATIONS) {

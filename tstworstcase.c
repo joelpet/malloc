@@ -9,7 +9,8 @@ int main(
         void *argv[])
 {
     int num_iterations = (argc > 1) ? atoi(argv[1]) : MAX_NUM_ITERATIONS;
-    int i, iter, size, lowbreak, highbreak;
+    int i, iter, size;
+    unsigned lowbreak, highbreak;
     MemoryBlock mem_blocks[MAX_NUM_ITERATIONS];
 
     if (num_iterations > MAX_NUM_ITERATIONS) {
@@ -41,10 +42,11 @@ int main(
 
                 /*
                  * Allocate new memory if the randomly chosen block is empty.
+                 * Make the size one byte to large to fit in perfect.
                  */
 
                 if (mem_blocks[i].ptr == NULL) {
-                    mem_blocks[i].size = 2 << (rand() % SIZE_EXP_SPAN + SIZE_MIN_EXP - 1);
+                    mem_blocks[i].size = 2 << (rand() % SIZE_EXP_SPAN + SIZE_MIN_EXP - 1) + 1;
                     mem_blocks[i].ptr = malloc(mem_blocks[i].size);
 
                     if (mem_blocks[i].ptr == NULL) {
