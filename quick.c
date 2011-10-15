@@ -113,10 +113,8 @@ void *malloc_quick(
         size_t nbytes) /* number of bytes of memory to allocate */
 {
     Header *moreroce(unsigned);
-    unsigned nunits;
     int list_index, i;
 
-    nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
     list_index = get_quick_fit_list_index(nbytes);
 
     /* 
