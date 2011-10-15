@@ -14,7 +14,8 @@ int main(
         char *argv[])
 {
     int num_iterations = (argc > 1) ? atoi(argv[1]) : MAX_NUM_ITERATIONS;
-    int i, j, lowbreak, highbreak;
+    int i, j;
+    void *lowbreak, *highbreak;
     MemoryBlock mem_blocks[MAX_NUM_ITERATIONS];
 
     if (num_iterations > MAX_NUM_ITERATIONS) {
@@ -27,7 +28,8 @@ int main(
     }
 
     lowbreak = sbrk(0);
-    srand(time(NULL));
+    srand(SEED);
+
 
     /*
      * Allocate memory with random powers of two sizes.
@@ -59,7 +61,7 @@ int main(
      * Print the statistics.
      */
 
-    fprintf(stderr, "Memory usage: %d b\n", highbreak - lowbreak);
+    fprintf(stderr, "Memory usage: %u b\n", (unsigned) (highbreak - lowbreak));
 
     return 0;
 }
