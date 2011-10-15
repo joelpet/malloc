@@ -1,5 +1,5 @@
 set xlabel "Iterations"
-set ylabel "Time (s)"
+set ylabel "Memory"
 set terminal png
 set output "tstbestcase_memory.png"
 
